@@ -3,6 +3,7 @@ import {
     put,
     call,
     cancelled,
+    select,
     takeEvery,
     takeLatest,
 } from 'redux-saga/effects';
@@ -15,6 +16,12 @@ import {
 
 const crudFetch = dataProvider => {
     function* handleFetch(action) {
+        const isOptimistic = yield select(state => state.admin.ui.optimistic);
+        if (isOptimistic) {
+            // in optimistic mode, all fetch actions are canceled,
+            // so the admin uses the store without synchronization
+            return;
+        }
         const { type, payload, meta: { fetch: fetchMeta, ...meta } } = action;
         const restType = fetchMeta;
 
